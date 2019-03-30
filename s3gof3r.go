@@ -24,11 +24,12 @@ var regionMatcher = regexp.MustCompile("s3[-.]([a-z0-9-]+).amazonaws.com([.a-z0-
 // the authentication keys for that service.
 type S3 struct {
 	Domain string // The s3-compatible endpoint. Defaults to "s3.amazonaws.com"
+	Region string
 	Keys
 }
 
 // Region returns the service region infering it from S3 domain.
-func (s *S3) Region() string {
+func (s *S3) region() string {
 	region := os.Getenv("AWS_REGION")
 	switch s.Domain {
 	case "s3.amazonaws.com", "s3-external-1.amazonaws.com":
@@ -38,16 +39,8 @@ func (s *S3) Region() string {
 			panic("can't find endpoint region")
 		}
 		return region
-	default:
-		regions := regionMatcher.FindStringSubmatch(s.Domain)
-		if len(regions) < 2 {
-			if region == "" {
-				panic("can't find endpoint region")
-			}
-			return region
-		}
-		return regions[1]
 	}
+	return s.Region
 }
 
 // A Bucket for an S3 service.
@@ -87,11 +80,11 @@ var DefaultDomain = "s3.amazonaws.com"
 
 // New Returns a new S3
 // domain defaults to DefaultDomain if empty
-func New(domain string, keys Keys) *S3 {
+func New(domain string, region string, keys Keys) *S3 {
 	if domain == "" {
 		domain = DefaultDomain
 	}
-	return &S3{domain, keys}
+	return &S3{domain, region, keys}
 }
 
 // Bucket returns a bucket on s3

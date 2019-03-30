@@ -53,7 +53,7 @@ func (b *Bucket) Sign(req *http.Request) {
 	s := &signer{
 		Time:    time.Now(),
 		Request: req,
-		Region:  b.S3.Region(),
+		Region:  b.S3.region(),
 		Keys:    b.S3.Keys,
 	}
 	s.sign()
