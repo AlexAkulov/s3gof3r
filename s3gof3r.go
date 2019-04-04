@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"path"
 	"regexp"
 	"strings"
@@ -26,21 +25,6 @@ type S3 struct {
 	Domain string // The s3-compatible endpoint. Defaults to "s3.amazonaws.com"
 	Region string
 	Keys
-}
-
-// Region returns the service region infering it from S3 domain.
-func (s *S3) region() string {
-	region := os.Getenv("AWS_REGION")
-	switch s.Domain {
-	case "s3.amazonaws.com", "s3-external-1.amazonaws.com":
-		return "us-east-1"
-	case "s3-accelerate.amazonaws.com":
-		if region == "" {
-			panic("can't find endpoint region")
-		}
-		return region
-	}
-	return s.Region
 }
 
 // A Bucket for an S3 service.
